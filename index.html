@@ -217,12 +217,12 @@ body.logged-in .sp-login{opacity:0;visibility:hidden;pointer-events:none}
             <div class="sp-af"><span class="sp-afl">Email</span><span class="sp-afv" id="accEmail">-</span></div>
             <div class="sp-af"><span class="sp-afl">Role</span><span class="sp-afv" id="accRole">-</span></div>
         </div>
-        <div class="sp-as" data-role="Admin,BEM,BPM,Fakultas">
+        <div class="sp-as" data-role="Admin">
             <h5><i class="fa-solid fa-database" style="color:var(--primary)"></i> Airtable</h5>
             <div class="sp-af"><span class="sp-afl">Status</span><span class="sp-afv" id="accAtStatus">-</span></div>
             <div class="sp-af"><span class="sp-afl">Base ID</span><span class="sp-afv" style="font-family:monospace;font-size:.75rem">appDJznOSFiUC3CzU</span></div>
         </div>
-        <div class="sp-as" data-role="Admin,BEM,BPM,Fakultas">
+        <div class="sp-as" data-role="Admin">
             <h5><i class="fa-solid fa-key" style="color:var(--primary)"></i> Airtable Token</h5>
             <div style="display:flex;gap:.5rem">
                 <input type="password" id="accToken" placeholder="patXXXXXXX..." style="flex:1;padding:.5rem;border:1px solid var(--border);border-radius:var(--r);font-size:.8rem;font-family:monospace">
@@ -718,8 +718,8 @@ function renderCell(v, fn) {
 function canApprove(role, cat) {
     if (role === 'Admin') return true;
     
-    const accBEM = ['surat', 'cp', 'cs', 'cj', 'cx', 'pfak', 'pls'];
-    const accBPM = ['surat', 'cp', 'cs', 'cj', 'cx', 'pfak', 'pls'];
+    const accBEM = ['surat', 'cp', 'cs', 'cj', 'cx', 'pls'];
+    const accBPM = ['surat', 'cp', 'cs', 'cj', 'cx', 'pls'];
     const accFak = ['surat', 'cp', 'cs', 'cj', 'cx', 'pfak', 'pls', 'lfak'];
 
     if (role === 'BEM') return accBEM.includes(cat);
@@ -743,39 +743,25 @@ function renderTable(recs, thId, tbId) {
         if (f._isLocal && u && u.role !== 'User') {
             actionHtml += `<button class="sp-expand bg-danger text-white mt-1 border-0" style="width:100%" onclick="deleteLocalData('${f._cat}', '${f._id}')"><i class="fa-solid fa-trash"></i> Hapus</button>`;
         }
-        if(f._isLocal && u) {
+        if (f._isLocal && u && canApprove(u.role, f._cat)) {
             if (f._cat === 'pfak') {
-                if (u.role === 'Fakultas' || u.role === 'Admin') {
-                    actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
-                        <button class="sp-login-btn p-1 flex-grow-1 bg-success text-white border-0" style="font-size:10px" title="Terima WD 1" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui', 'ACC WD 1')">ACC WD 1</button>
-                        <button class="sp-login-btn p-1 flex-grow-1 bg-success text-white border-0" style="font-size:10px" title="Terima WD 2" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui', 'ACC WD 2')">ACC WD 2</button>
-                    </div>`;
-                    actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
-                        <button class="sp-login-btn p-1 flex-grow-1 bg-danger text-white border-0" style="font-size:10px" title="Tolak WD 1" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak', 'ACC WD 1')">Tolak WD 1</button>
-                        <button class="sp-login-btn p-1 flex-grow-1 bg-danger text-white border-0" style="font-size:10px" title="Tolak WD 2" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak', 'ACC WD 2')">Tolak WD 2</button>
-                    </div>`;
-                } else if (u.role === 'BEM') {
-                    actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
-                        <button class="sp-login-btn p-1 flex-grow-1 bg-success text-white border-0" style="font-size:10px" title="Terima WD 1" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui', 'ACC WD 1')">ACC WD 1</button>
-                        <button class="sp-login-btn p-1 flex-grow-1 bg-danger text-white border-0" style="font-size:10px" title="Tolak WD 1" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak', 'ACC WD 1')">Tolak WD 1</button>
-                    </div>`;
-                } else if (u.role === 'BPM') {
-                    actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
-                        <button class="sp-login-btn p-1 flex-grow-1 bg-success text-white border-0" style="font-size:10px" title="Terima WD 2" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui', 'ACC WD 2')">ACC WD 2</button>
-                        <button class="sp-login-btn p-1 flex-grow-1 bg-danger text-white border-0" style="font-size:10px" title="Tolak WD 2" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak', 'ACC WD 2')">Tolak WD 2</button>
-                    </div>`;
-                }
+                actionHtml += `
+                <select class="sp-login-btn mt-1 w-100 p-1 bg-secondary text-white border-0" onchange="if(this.value){ const [field, stat] = this.value.split('|'); updateLocalStatus('${f._cat}', '${f._id}', stat, field); this.value=''; }">
+                    <option value="">-- Aksi WD --</option>
+                    <option value="ACC WD 1|Disetujui">✅ Terima WD 1</option>
+                    <option value="ACC WD 1|Ditolak">❌ Tolak WD 1</option>
+                    <option value="ACC WD 2|Disetujui">✅ Terima WD 2</option>
+                    <option value="ACC WD 2|Ditolak">❌ Tolak WD 2</option>
+                </select>`;
             } else {
-                if(canApprove(u.role, f._cat)) {
-                    actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
-                        <button class="sp-login-btn p-1 flex-grow-1 bg-success border-0" title="Terima" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui')"><i class="fa-solid fa-check"></i></button>
-                        <button class="sp-login-btn p-1 flex-grow-1 bg-danger border-0" title="Tolak" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak')"><i class="fa-solid fa-xmark"></i></button>
-                    </div>`;
-                }
+                actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
+                    <button class="sp-login-btn p-1 flex-grow-1 bg-success border-0" title="Terima" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui')"><i class="fa-solid fa-check"></i></button>
+                    <button class="sp-login-btn p-1 flex-grow-1 bg-danger border-0" title="Tolak" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak')"><i class="fa-solid fa-xmark"></i></button>
+                </div>`;
             }
-            if ((u.role === 'Fakultas' || u.role === 'Admin') && f._cat !== 'surat') {
-                actionHtml += `<button class="sp-expand bg-info text-white mt-1 border-0" style="width:100%" onclick="updateKeterangan('${f._cat}', '${f._id}')"><i class="fa-solid fa-pen"></i> Isi Keterangan</button>`;
-            }
+        }
+        if (f._isLocal && u && (u.role === 'Fakultas' || u.role === 'Admin') && f._cat !== 'surat') {
+            actionHtml += `<button class="sp-expand bg-info text-white mt-1 border-0" style="width:100%" onclick="updateKeterangan('${f._cat}', '${f._id}')"><i class="fa-solid fa-pen"></i> Isi Keterangan</button>`;
         }
         return `<tr><td>${i+1}</td>${ff.map(k=>`<td>${renderCell(f[k],k)}</td>`).join('')}<td>${actionHtml}</td></tr>`;
     }).join('');
@@ -795,10 +781,21 @@ function renderGrid(recs, cId) {
             actionHtml += `<button class="sp-login-btn py-1 px-2 mt-2 w-100 bg-danger text-white border-0" onclick="deleteLocalData('${f._cat}', '${f._id}'); event.stopPropagation();"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>`;
         }
         if(f._isLocal && u && canApprove(u.role, f._cat)) {
-            actionHtml += `<div class="mt-2 d-flex" style="gap:10px;">
-                <button class="sp-login-btn py-1 px-2 flex-grow-1 bg-success border-0" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui'); event.stopPropagation();"><i class="fa-solid fa-check mr-1"></i> Terima</button>
-                <button class="sp-login-btn py-1 px-2 flex-grow-1 bg-danger border-0" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak'); event.stopPropagation();"><i class="fa-solid fa-xmark mr-1"></i> Tolak</button>
-            </div>`;
+            if (f._cat === 'pfak') {
+                actionHtml += `
+                <select class="sp-login-btn mt-2 w-100 p-2 bg-secondary text-white border-0" onchange="if(this.value){ const [field, stat] = this.value.split('|'); updateLocalStatus('${f._cat}', '${f._id}', stat, field); this.value=''; event.stopPropagation(); }" onclick="event.stopPropagation()">
+                    <option value="">-- Aksi WD --</option>
+                    <option value="ACC WD 1|Disetujui">✅ Terima WD 1</option>
+                    <option value="ACC WD 1|Ditolak">❌ Tolak WD 1</option>
+                    <option value="ACC WD 2|Disetujui">✅ Terima WD 2</option>
+                    <option value="ACC WD 2|Ditolak">❌ Tolak WD 2</option>
+                </select>`;
+            } else {
+                actionHtml += `<div class="mt-2 d-flex" style="gap:10px;">
+                    <button class="sp-login-btn py-1 px-2 flex-grow-1 bg-success border-0" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui'); event.stopPropagation();"><i class="fa-solid fa-check mr-1"></i> Terima</button>
+                    <button class="sp-login-btn py-1 px-2 flex-grow-1 bg-danger border-0" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak'); event.stopPropagation();"><i class="fa-solid fa-xmark mr-1"></i> Tolak</button>
+                </div>`;
+            }
         }
 
         return `<div class="col-12 col-md-6 col-lg-4">
