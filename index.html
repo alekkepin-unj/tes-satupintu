@@ -747,7 +747,7 @@ function renderTable(recs, thId, tbId) {
             if (f._cat === 'pfak') {
                 actionHtml += `
                 <select class="sp-login-btn mt-1 w-100 p-1 bg-secondary text-white border-0" onchange="if(this.value){ const [field, stat] = this.value.split('|'); updateLocalStatus('${f._cat}', '${f._id}', stat, field); this.value=''; }">
-                    <option value="">-- Aksi WD --</option>
+                    <option value="">Aksi</option>
                     <option value="ACC WD 1|Disetujui">✅ Terima WD 1</option>
                     <option value="ACC WD 1|Ditolak">❌ Tolak WD 1</option>
                     <option value="ACC WD 2|Disetujui">✅ Terima WD 2</option>
@@ -784,7 +784,7 @@ function renderGrid(recs, cId) {
             if (f._cat === 'pfak') {
                 actionHtml += `
                 <select class="sp-login-btn mt-2 w-100 p-2 bg-secondary text-white border-0" onchange="if(this.value){ const [field, stat] = this.value.split('|'); updateLocalStatus('${f._cat}', '${f._id}', stat, field); this.value=''; event.stopPropagation(); }" onclick="event.stopPropagation()">
-                    <option value="">-- Aksi WD --</option>
+                    <option value="">Aksi</option>
                     <option value="ACC WD 1|Disetujui">✅ Terima WD 1</option>
                     <option value="ACC WD 1|Ditolak">❌ Tolak WD 1</option>
                     <option value="ACC WD 2|Disetujui">✅ Terima WD 2</option>
