@@ -156,7 +156,7 @@ a{color:var(--primary);text-decoration:none}a:hover{color:#003d91;text-decoratio
 .sp-af:last-child{border-bottom:none}.sp-afl{color:var(--muted);font-size:.8rem}.sp-afv{font-weight:500}
 
 /* Auth gate */
-.sp-gated{display:none}body.logged-in .sp-gated{display:block}body.logged-in .sp-login{opacity:0;visibility:hidden;pointer-events:none}
+body.logged-in .sp-login{opacity:0;visibility:hidden;pointer-events:none}
 
 /* Setup banner */
 .sp-banner{background:linear-gradient(135deg,#fef3c7,#fde68a);border-bottom:1px solid #f59e0b;padding:.75rem 1rem;text-align:center;font-size:.85rem;color:#92400e}
@@ -178,12 +178,13 @@ a{color:var(--primary);text-decoration:none}a:hover{color:#003d91;text-decoratio
 <body>
 
 <!-- ==================== LOGIN PAGE ==================== -->
-<div class="sp-login" id="loginOverlay">
-    <div class="sp-login-card">
+<div class="sp-login hidden" id="loginOverlay">
+    <div class="sp-login-card" style="position:relative;">
+        <button class="sp-mx" onclick="document.getElementById('loginOverlay').classList.add('hidden')" style="position:absolute; right:15px; top:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
         <img src="https://assets.softr-files.com/applications/2410f17e-de32-4977-adbc-a2c3e1642492/assets/10688f79-6bcc-459b-87d2-d00ae035b179.png" alt="SATU PINTU"
              onerror="this.outerHTML='<div style=font-size:2rem;font-weight:700;color:#0058d1;margin-bottom:1.5rem>SATU PINTU</div>'">
-        <h2>Selamat Datang</h2>
-        <p class="sp-login-sub">Masuk ke akun SATU PINTU kamu</p>
+        <h2>Login Admin</h2>
+        <p class="sp-login-sub">Masuk ke dashboard SATU PINTU</p>
         <div class="sp-login-err" id="loginError"><i class="fa-solid fa-circle-exclamation"></i><span id="loginErrorText">Email atau password salah.</span></div>
         <form class="sp-login-form" onsubmit="handleLogin(event)">
             <label><i class="fa-solid fa-envelope mr-1" style="font-weight:400"></i> Email</label>
@@ -274,12 +275,12 @@ a{color:var(--primary);text-decoration:none}a:hover{color:#003d91;text-decoratio
             </a>
             <div class="d-none d-md-flex align-items-center" style="gap:.5rem">
                 <div class="dropdown ml-2">
-                    <button class="btn p-0 d-flex align-items-center" style="border:none;gap:.5rem" data-toggle="dropdown">
+                    <button class="btn p-0 d-flex align-items-center" style="border:none;gap:.5rem" onclick="if(!getUser()) { document.getElementById('loginOverlay').classList.remove('hidden'); return false; }" data-toggle="dropdown">
                         <div class="sp-avatar" id="navAvatar">?</div>
                         <span class="sp-uname d-none d-lg-inline" id="navName"></span>
                         <i class="fa-solid fa-chevron-down" style="font-size:.6rem;color:var(--muted)"></i>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-right" style="font-family:var(--font);font-size:.85rem;min-width:220px">
+                    <div class="dropdown-menu dropdown-menu-right" id="navDropdownMenu" style="font-family:var(--font);font-size:.85rem;min-width:220px">
                         <div style="padding:.5rem 1rem;border-bottom:1px solid var(--border);margin-bottom:.25rem">
                             <div style="font-weight:600" id="ddName">-</div>
                             <div style="font-size:.75rem;color:var(--muted)" id="ddEmail">-</div>
@@ -307,8 +308,7 @@ a{color:var(--primary);text-decoration:none}a:hover{color:#003d91;text-decoratio
     </div>
 </nav>
 
-<!-- ==================== AUTH-GATED CONTENT ==================== -->
-<div class="sp-gated">
+<!-- ==================== CONTENT ==================== -->
 
 <!-- WELCOME -->
 <section class="sp-welcome">
@@ -328,11 +328,11 @@ a{color:var(--primary);text-decoration:none}a:hover{color:#003d91;text-decoratio
 <section class="sp-ql">
     <div class="container-fluid px-3 px-md-4">
         <div class="row justify-content-center" style="row-gap:1rem">
-            <div class="col-6 col-md-4 col-lg" data-role="Admin,BEM,BPM,Fakultas,User"><a href="javascript:void(0)" onclick="openUploadModal('surat')" class="sp-qlc d-block text-decoration-none"><div class="sp-qli"><i class="fa-solid fa-envelope"></i></div><h6>Ajukan Persuratan</h6><p>BEM</p></a></div>
-            <div class="col-6 col-md-4 col-lg" data-role="Admin,BEM,BPM,Fakultas,User"><a href="javascript:void(0)" onclick="openUploadModal('admin')" class="sp-qlc d-block text-decoration-none"><div class="sp-qli"><i class="fa-solid fa-file-lines"></i></div><h6>Ajukan Administrasi</h6><p>BEM & BPM</p></a></div>
-            <div class="col-6 col-md-4 col-lg" data-role="Admin,BEM,BPM,Fakultas,User"><a href="javascript:void(0)" onclick="openUploadModal('prop_fak')" class="sp-qlc d-block text-decoration-none"><div class="sp-qli"><i class="fa-solid fa-building-columns"></i></div><h6>Ajukan Proposal</h6><p>Fakultas</p></a></div>
-            <div class="col-6 col-md-4 col-lg" data-role="Admin,BEM,BPM,Fakultas,User"><a href="javascript:void(0)" onclick="openUploadModal('lpj_fak')" class="sp-qlc d-block text-decoration-none"><div class="sp-qli"><i class="fa-solid fa-folder-open"></i></div><h6>Pengumpulan LPJ</h6><p>Fakultas</p></a></div>
-            <div class="col-6 col-md-4 col-lg" data-role="Admin,BEM,BPM,Fakultas,User"><a href="javascript:void(0)" onclick="openUploadModal('sertif')" class="sp-qlc d-block text-decoration-none"><div class="sp-qli"><i class="fa-solid fa-certificate"></i></div><h6>Ajukan Sertifikat</h6><p>BEM</p></a></div>
+            <div class="col-6 col-md-4 col-lg"><a href="javascript:void(0)" onclick="openUploadModal('surat')" class="sp-qlc d-block text-decoration-none"><div class="sp-qli"><i class="fa-solid fa-envelope"></i></div><h6>Ajukan Persuratan</h6><p>BEM</p></a></div>
+            <div class="col-6 col-md-4 col-lg"><a href="javascript:void(0)" onclick="openUploadModal('admin')" class="sp-qlc d-block text-decoration-none"><div class="sp-qli"><i class="fa-solid fa-file-lines"></i></div><h6>Ajukan Administrasi</h6><p>BEM & BPM</p></a></div>
+            <div class="col-6 col-md-4 col-lg"><a href="javascript:void(0)" onclick="openUploadModal('prop_fak')" class="sp-qlc d-block text-decoration-none"><div class="sp-qli"><i class="fa-solid fa-building-columns"></i></div><h6>Ajukan Proposal</h6><p>Fakultas</p></a></div>
+            <div class="col-6 col-md-4 col-lg"><a href="javascript:void(0)" onclick="openUploadModal('lpj_fak')" class="sp-qlc d-block text-decoration-none"><div class="sp-qli"><i class="fa-solid fa-folder-open"></i></div><h6>Pengumpulan LPJ</h6><p>Fakultas</p></a></div>
+            <div class="col-6 col-md-4 col-lg"><a href="javascript:void(0)" onclick="openUploadModal('sertif')" class="sp-qlc d-block text-decoration-none"><div class="sp-qli"><i class="fa-solid fa-certificate"></i></div><h6>Ajukan Sertifikat</h6><p>BEM</p></a></div>
         </div>
     </div>
 </section>
@@ -341,20 +341,23 @@ a{color:var(--primary);text-decoration:none}a:hover{color:#003d91;text-decoratio
 <section class="sp-cols">
     <div class="container-fluid px-3 px-md-4">
         <div class="row" style="row-gap:1rem">
-            <div class="col-6 col-md-3" data-role="Admin,BEM,BPM,Fakultas,User"><div class="sp-sc"><div class="sp-sn" id="s-surat">-</div><div class="sp-sl">Pengajuan Surat</div></div></div>
-            <div class="col-6 col-md-3" data-role="Admin,BEM,BPM,Fakultas,User"><div class="sp-sc"><div class="sp-sn" id="s-pls">-</div><div class="sp-sl">Pengajuan PLS</div></div></div>
-            <div class="col-6 col-md-3" data-role="Admin,BEM,BPM,Fakultas,User"><div class="sp-sc"><div class="sp-sn" id="s-fak">-</div><div class="sp-sl">Pengajuan Fakultas</div></div></div>
-            <div class="col-6 col-md-3" data-role="Admin,BEM,BPM,Fakultas,User"><div class="sp-sc"><div class="sp-sn" id="s-cert">-</div><div class="sp-sl">Sertifikat</div></div></div>
+            <div class="col-6 col-md-3"><div class="sp-sc"><div class="sp-sn" id="s-surat">-</div><div class="sp-sl">Pengajuan Surat</div></div></div>
+            <div class="col-6 col-md-3"><div class="sp-sc"><div class="sp-sn" id="s-pls">-</div><div class="sp-sl">Pengajuan PLS</div></div></div>
+            <div class="col-6 col-md-3"><div class="sp-sc"><div class="sp-sn" id="s-fak">-</div><div class="sp-sl">Pengajuan Fakultas</div></div></div>
+            <div class="col-6 col-md-3"><div class="sp-sc"><div class="sp-sn" id="s-cert">-</div><div class="sp-sl">Sertifikat</div></div></div>
         </div>
     </div>
 </section>
 
 <!-- TABLE: Pengajuan Surat -->
-<section class="sp-sec" id="sec-surat" data-role="Admin,BEM,BPM,Fakultas,User">
+<section class="sp-sec" id="sec-surat">
     <div class="container-fluid px-3 px-md-4">
         <div class="sp-sh">
             <h3 class="sp-st"><i class="fa-solid fa-envelope" style="color:var(--primary)"></i> Pengajuan Surat <span class="badge badge-primary" id="c-surat"></span></h3>
-            <div class="sp-sr"><i class="fa-solid fa-search"></i><input placeholder="Cari..." oninput="filterTbl(this,'tb-surat')"></div>
+            <div class="d-flex align-items-center" style="gap:10px">
+                <button data-role="Admin,BEM,BPM,Fakultas" class="sp-login-btn py-1 px-3 bg-secondary border-0" title="Download CSV" onclick="downloadCSV('surat', 'Persuratan')"><i class="fa-solid fa-download"></i></button>
+                <div class="sp-sr"><i class="fa-solid fa-search"></i><input placeholder="Cari..." oninput="filterTbl(this,'tb-surat')"></div>
+            </div>
         </div>
         <div class="sp-tw"><div class="table-responsive"><table class="sp-t"><thead id="th-surat"></thead><tbody id="tb-surat"></tbody></table></div>
         <div class="sp-ld" id="ld-surat"><i class="fa-solid fa-spinner"></i><p>Memuat...</p></div></div>
@@ -362,11 +365,14 @@ a{color:var(--primary);text-decoration:none}a:hover{color:#003d91;text-decoratio
 </section>
 
 <!-- TABLE: Pengajuan PLS -->
-<section class="sp-sec" id="sec-pls" data-role="Admin,BEM,BPM,Fakultas,User">
+<section class="sp-sec" id="sec-pls">
     <div class="container-fluid px-3 px-md-4">
         <div class="sp-sh">
             <h3 class="sp-st"><i class="fa-solid fa-file-lines" style="color:var(--primary)"></i> Pengajuan PLS <span class="badge badge-info" id="c-pls"></span></h3>
-            <div class="sp-sr"><i class="fa-solid fa-search"></i><input placeholder="Cari..." oninput="filterTbl(this,'tb-pls')"></div>
+            <div class="d-flex align-items-center" style="gap:10px">
+                <button data-role="Admin,BEM,BPM,Fakultas" class="sp-login-btn py-1 px-3 bg-secondary border-0" title="Download CSV" onclick="downloadCSV('pls', 'Administrasi')"><i class="fa-solid fa-download"></i></button>
+                <div class="sp-sr"><i class="fa-solid fa-search"></i><input placeholder="Cari..." oninput="filterTbl(this,'tb-pls')"></div>
+            </div>
         </div>
         <div class="sp-tw"><div class="table-responsive"><table class="sp-t"><thead id="th-pls"></thead><tbody id="tb-pls"></tbody></table></div>
         <div class="sp-ld" id="ld-pls"><i class="fa-solid fa-spinner"></i><p>Memuat...</p></div></div>
@@ -374,11 +380,14 @@ a{color:var(--primary);text-decoration:none}a:hover{color:#003d91;text-decoratio
 </section>
 
 <!-- TABLE: Pengajuan (P) Fakultas -->
-<section class="sp-sec" id="sec-fak" data-role="Admin,BEM,BPM,Fakultas,User">
+<section class="sp-sec" id="sec-fak">
     <div class="container-fluid px-3 px-md-4">
         <div class="sp-sh">
             <h3 class="sp-st"><i class="fa-solid fa-building-columns" style="color:var(--primary)"></i> Pengajuan (P) Fakultas <span class="badge badge-warning text-dark" id="c-pfak"></span></h3>
-            <div class="sp-sr"><i class="fa-solid fa-search"></i><input placeholder="Cari..." oninput="filterTbl(this,'tb-pfak')"></div>
+            <div class="d-flex align-items-center" style="gap:10px">
+                <button data-role="Admin,BEM,BPM,Fakultas" class="sp-login-btn py-1 px-3 bg-secondary border-0" title="Download CSV" onclick="downloadCSV('pfak', 'Proposal')"><i class="fa-solid fa-download"></i></button>
+                <div class="sp-sr"><i class="fa-solid fa-search"></i><input placeholder="Cari..." oninput="filterTbl(this,'tb-pfak')"></div>
+            </div>
         </div>
         <div class="sp-tw"><div class="table-responsive"><table class="sp-t"><thead id="th-pfak"></thead><tbody id="tb-pfak"></tbody></table></div>
         <div class="sp-ld" id="ld-pfak"><i class="fa-solid fa-spinner"></i><p>Memuat...</p></div></div>
@@ -386,7 +395,7 @@ a{color:var(--primary);text-decoration:none}a:hover{color:#003d91;text-decoratio
 </section>
 
 <!-- GRID: Pengajuan (L) Fakultas -->
-<section class="sp-sec" id="sec-lfak" data-role="Admin,BEM,BPM,Fakultas,User">
+<section class="sp-sec" id="sec-lfak">
     <div class="container-fluid px-3 px-md-4">
         <div class="sp-sh"><h3 class="sp-st"><i class="fa-solid fa-folder-open" style="color:var(--primary)"></i> Pengajuan (L) Fakultas <span class="badge badge-secondary" id="c-lfak"></span></h3></div>
         <div class="row" style="row-gap:1rem" id="gr-lfak"></div>
@@ -395,7 +404,7 @@ a{color:var(--primary);text-decoration:none}a:hover{color:#003d91;text-decoratio
 </section>
 
 <!-- SERTIFIKAT (4 tabs) -->
-<section class="sp-sec" id="sec-cert" data-role="Admin,BEM,BPM,Fakultas,User">
+<section class="sp-sec" id="sec-cert">
     <div class="container-fluid px-3 px-md-4">
         <div class="sp-sh"><h3 class="sp-st"><i class="fa-solid fa-certificate" style="color:var(--primary)"></i> Sertifikat</h3></div>
         <div class="sp-tabs">
@@ -410,8 +419,6 @@ a{color:var(--primary);text-decoration:none}a:hover{color:#003d91;text-decoratio
         <div id="tx" class="sp-tc"><div class="sp-tw"><div class="table-responsive"><table class="sp-t"><thead id="th-cx"></thead><tbody id="tb-cx"></tbody></table></div><div class="sp-ld" id="ld-cx"><i class="fa-solid fa-spinner"></i><p>Memuat...</p></div></div></div>
     </div>
 </section>
-
-</div><!-- /sp-gated -->
 
 <!-- FOOTER -->
 <footer class="sp-ft">
@@ -582,6 +589,7 @@ function changePassword() {
 
 function applyLogin(user) {
     document.body.classList.add('logged-in');
+    document.getElementById('loginOverlay').classList.add('hidden');
     const initials = user.name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
 
     // Update semua elemen user di navbar
@@ -621,12 +629,20 @@ function applyLogin(user) {
 function handleLogout() {
     clearUser();
     document.body.classList.remove('logged-in');
-    document.getElementById('loginOverlay').classList.remove('hidden');
     document.getElementById('loginEmail').value = '';
     document.getElementById('loginPassword').value = '';
-    // Reset semua role visibility
-    document.querySelectorAll('[data-role]').forEach(el => el.style.display = '');
+    
+    // Reset to public state
+    ['navAvatar','mobAvatar'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML='<i class="fa-solid fa-lock"></i>'; });
+    ['navName','mobName'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent='Login Admin'; });
+    ['ddName','ddEmail','mobEmail'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=''; });
+    const g = document.getElementById('wGreet');
+    if(g) g.textContent = 'Halo, Mahasiswa!';
+    
+    document.querySelectorAll('[data-role]').forEach(el => el.style.display = 'none');
+    
     closeAccount();
+    loadAllData();
 }
 
 // ROLE-BASED ACCESS CONTROL
@@ -690,13 +706,27 @@ function renderStatus(v) {
 function renderCell(v, fn) {
     if(v==null) return '-';
     const fl=fn.toLowerCase();
-    if(/status|tahap|fase|progress/.test(fl)) return renderStatus(v);
+    if(/status|tahap|fase|progress|acc/.test(fl)) return renderStatus(v);
     if(Array.isArray(v)&&v.length&&v[0].url) return v.map(a=>a.type&&a.type.startsWith('image/')?`<img src="${a.thumbnails?.small?.url||a.url}" class="sp-img">`:`<a href="${a.url}" target="_blank"><i class="fa-solid fa-paperclip mr-1"></i>${esc(a.filename||'File')}</a>`).join(' ');
     if(Array.isArray(v)) return v.map(x=>`<span class="badge badge-light mr-1">${esc(x)}</span>`).join('');
     if(typeof v==='boolean') return v?'<i class="fa-solid fa-check text-success"></i>':'<i class="fa-solid fa-xmark text-muted"></i>';
     const s=String(v);
     if(/^https?:\/\//.test(s)) return `<a href="${s}" target="_blank">${esc(s.length>40?s.substring(0,40)+'...':s)}</a>`;
     return esc(s.length>80?s.substring(0,80)+'…':s);
+}
+
+function canApprove(role, cat) {
+    if (role === 'Admin') return true;
+    
+    const accBEM = ['surat', 'cp', 'cs', 'cj', 'cx', 'pfak', 'pls'];
+    const accBPM = ['surat', 'cp', 'cs', 'cj', 'cx', 'pfak', 'pls'];
+    const accFak = ['surat', 'cp', 'cs', 'cj', 'cx', 'pfak', 'pls', 'lfak'];
+
+    if (role === 'BEM') return accBEM.includes(cat);
+    if (role === 'BPM') return accBPM.includes(cat);
+    if (role === 'Fakultas') return accFak.includes(cat);
+    
+    return false;
 }
 
 function renderTable(recs, thId, tbId) {
@@ -710,11 +740,42 @@ function renderTable(recs, thId, tbId) {
     tb.innerHTML=recs.map((r,i)=> {
         const f = r.fields;
         let actionHtml = `<button class="sp-expand" onclick='showRec(${JSON.stringify(f).replace(/'/g,"&#39;")})'>Detail</button>`;
-        if(f._isLocal && u && u.role !== 'User') {
-            actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
-                <button class="sp-login-btn p-1 flex-grow-1 bg-success border-0" title="Terima" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui')"><i class="fa-solid fa-check"></i></button>
-                <button class="sp-login-btn p-1 flex-grow-1 bg-danger border-0" title="Tolak" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak')"><i class="fa-solid fa-xmark"></i></button>
-            </div>`;
+        if (f._isLocal && u && u.role !== 'User') {
+            actionHtml += `<button class="sp-expand bg-danger text-white mt-1 border-0" style="width:100%" onclick="deleteLocalData('${f._cat}', '${f._id}')"><i class="fa-solid fa-trash"></i> Hapus</button>`;
+        }
+        if(f._isLocal && u) {
+            if (f._cat === 'pfak') {
+                if (u.role === 'Fakultas' || u.role === 'Admin') {
+                    actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-success text-white border-0" style="font-size:10px" title="Terima WD 1" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui', 'ACC WD 1')">ACC WD 1</button>
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-success text-white border-0" style="font-size:10px" title="Terima WD 2" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui', 'ACC WD 2')">ACC WD 2</button>
+                    </div>`;
+                    actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-danger text-white border-0" style="font-size:10px" title="Tolak WD 1" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak', 'ACC WD 1')">Tolak WD 1</button>
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-danger text-white border-0" style="font-size:10px" title="Tolak WD 2" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak', 'ACC WD 2')">Tolak WD 2</button>
+                    </div>`;
+                } else if (u.role === 'BEM') {
+                    actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-success text-white border-0" style="font-size:10px" title="Terima WD 1" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui', 'ACC WD 1')">ACC WD 1</button>
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-danger text-white border-0" style="font-size:10px" title="Tolak WD 1" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak', 'ACC WD 1')">Tolak WD 1</button>
+                    </div>`;
+                } else if (u.role === 'BPM') {
+                    actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-success text-white border-0" style="font-size:10px" title="Terima WD 2" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui', 'ACC WD 2')">ACC WD 2</button>
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-danger text-white border-0" style="font-size:10px" title="Tolak WD 2" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak', 'ACC WD 2')">Tolak WD 2</button>
+                    </div>`;
+                }
+            } else {
+                if(canApprove(u.role, f._cat)) {
+                    actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-success border-0" title="Terima" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui')"><i class="fa-solid fa-check"></i></button>
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-danger border-0" title="Tolak" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak')"><i class="fa-solid fa-xmark"></i></button>
+                    </div>`;
+                }
+            }
+            if ((u.role === 'Fakultas' || u.role === 'Admin') && f._cat !== 'surat') {
+                actionHtml += `<button class="sp-expand bg-info text-white mt-1 border-0" style="width:100%" onclick="updateKeterangan('${f._cat}', '${f._id}')"><i class="fa-solid fa-pen"></i> Isi Keterangan</button>`;
+            }
         }
         return `<tr><td>${i+1}</td>${ff.map(k=>`<td>${renderCell(f[k],k)}</td>`).join('')}<td>${actionHtml}</td></tr>`;
     }).join('');
@@ -727,19 +788,26 @@ function renderGrid(recs, cId) {
     const u = getUser();
     c.innerHTML=recs.map(r=>{
         const f=r.fields, keys=Object.keys(f).filter(k=>!k.startsWith('_'));
-        const t=f[keys[0]]||'Untitled', d=keys[1]?f[keys[1]]:'', sk=keys.find(x=>/status/i.test(x)), dk=keys.find(x=>/tanggal|date/i.test(x));
+        const t=f[keys[0]]||'Untitled', d=keys[1]?f[keys[1]]:'', dk=keys.find(x=>/tanggal|date/i.test(x));
         
         let actionHtml = '';
-        if(f._isLocal && u && u.role !== 'User') {
-            actionHtml = `<div class="mt-2 d-flex" style="gap:10px;">
+        if (f._isLocal && u && u.role !== 'User') {
+            actionHtml += `<button class="sp-login-btn py-1 px-2 mt-2 w-100 bg-danger text-white border-0" onclick="deleteLocalData('${f._cat}', '${f._id}'); event.stopPropagation();"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>`;
+        }
+        if(f._isLocal && u && canApprove(u.role, f._cat)) {
+            actionHtml += `<div class="mt-2 d-flex" style="gap:10px;">
                 <button class="sp-login-btn py-1 px-2 flex-grow-1 bg-success border-0" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui'); event.stopPropagation();"><i class="fa-solid fa-check mr-1"></i> Terima</button>
                 <button class="sp-login-btn py-1 px-2 flex-grow-1 bg-danger border-0" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak'); event.stopPropagation();"><i class="fa-solid fa-xmark mr-1"></i> Tolak</button>
             </div>`;
         }
-        
+
         return `<div class="col-12 col-md-6 col-lg-4">
             <div class="sp-gc" onclick='showRec(${JSON.stringify(f).replace(/'/g,"&#39;")})' style="cursor:pointer">
-                <div class="sp-gch"><h6>${esc(String(t).substring(0,60))}</h6>${sk?renderStatus(f[sk]):''}</div>
+                <div class="sp-gch"><h6>${esc(String(t).substring(0,60))}</h6>
+                    <div class="d-flex flex-column align-items-end" style="gap:2px">
+                        ${keys.filter(x=>/status|acc/i.test(x)).map(k=>`<div style="font-size:0.65rem; color:#64748b;">${k}: ${renderStatus(f[k])}</div>`).join('')}
+                    </div>
+                </div>
                 <p>${esc(String(d||'').substring(0,120))}</p>
                 <div class="sp-gm">${dk?`<span><i class="fa-regular fa-calendar"></i> ${esc(f[dk])}</span>`:''}<span><i class="fa-regular fa-file"></i> ${keys.length} fields</span></div>
                 ${actionHtml}
@@ -761,7 +829,17 @@ function showRec(f) {
 }
 
 function closeRecord() { document.getElementById('recordModal').style.display='none'; }
-function openAccount() { document.getElementById('accountModal').style.display='flex'; const t=getToken(); if(t) document.getElementById('accAtStatus').innerHTML=`<span class="st st-a"><span class="st-dot"></span> Terhubung</span>`; else document.getElementById('accAtStatus').innerHTML=`<span class="st st-r"><span class="st-dot"></span> Belum terhubung</span>`; }
+function openAccount() { 
+    if(!getUser()) {
+        document.getElementById('loginOverlay').classList.remove('hidden');
+        const mob = document.getElementById('mobMenu');
+        if(mob) mob.classList.add('d-none');
+        return;
+    }
+    document.getElementById('accountModal').style.display='flex'; 
+    const t=getToken(); 
+    if(t) document.getElementById('accAtStatus').innerHTML=`<span class="st st-a"><span class="st-dot"></span> Terhubung</span>`; else document.getElementById('accAtStatus').innerHTML=`<span class="st st-r"><span class="st-dot"></span> Belum terhubung</span>`; 
+}
 function closeAccount() { document.getElementById('accountModal').style.display='none'; }
 
 const FORMS = {
@@ -887,13 +965,27 @@ async function handleUpload(e) {
 
         const fields = {
             "Tanggal": new Date().toLocaleDateString('id-ID'),
-            "Pengirim": user ? user.name : 'Unknown',
             "Email": user ? user.email : '',
-            "Status": "Pending",
             "_isLocal": true,
             "_id": 'loc_' + Date.now(),
             "_cat": tblKey
         };
+        
+        if (tblKey === 'pls') {
+            fields["ACC BEM"] = "Pending";
+            fields["ACC BPM"] = "Pending";
+            fields["Keterangan"] = "";
+        } else if (tblKey === 'pfak') {
+            fields["ACC WD 1"] = "Pending";
+            fields["ACC WD 2"] = "Pending";
+            fields["Keterangan"] = "";
+        } else if (tblKey === 'lfak') {
+            fields["ACC FAKULTAS"] = "Pending";
+            fields["Keterangan"] = "";
+        } else {
+            fields["ACC BEM"] = "Pending";
+            // Do NOT add Keterangan for surat
+        }
         
         const inputs = document.getElementById('uploadForm').querySelectorAll('input:not([type="radio"]):not([type="hidden"]):not([type="file"]), input[type="radio"]:checked');
         inputs.forEach(inp => {
@@ -922,15 +1014,91 @@ async function handleUpload(e) {
     }
 }
 
-window.updateLocalStatus = function(cat, id, newStatus) {
+window.updateLocalStatus = function(cat, id, newStatus, specificField) {
+    const u = getUser();
+    if(!u) return;
     if(!confirm(`Yakin ubah status menjadi ${newStatus}?`)) return;
+    
     const locData = JSON.parse(localStorage.getItem('sp_local_' + cat) || '[]');
     const idx = locData.findIndex(x => x.fields._id === id);
     if(idx !== -1) {
-        locData[idx].fields.Status = newStatus;
+        if (specificField) {
+            locData[idx].fields[specificField] = newStatus;
+        } else {
+            let fieldToUpdate = "Status";
+            if (u.role === 'BEM') fieldToUpdate = (cat === 'pfak') ? "ACC WD 1" : "ACC BEM";
+            else if (u.role === 'BPM') fieldToUpdate = (cat === 'pfak') ? "ACC WD 2" : "ACC BPM";
+            else if (u.role === 'Fakultas') fieldToUpdate = "ACC FAKULTAS";
+            
+            if (u.role === 'Admin') {
+                if (locData[idx].fields["ACC BEM"] !== undefined) locData[idx].fields["ACC BEM"] = newStatus;
+                if (locData[idx].fields["ACC BPM"] !== undefined) locData[idx].fields["ACC BPM"] = newStatus;
+                if (locData[idx].fields["ACC WD 1"] !== undefined) locData[idx].fields["ACC WD 1"] = newStatus;
+                if (locData[idx].fields["ACC WD 2"] !== undefined) locData[idx].fields["ACC WD 2"] = newStatus;
+                if (locData[idx].fields["ACC FAKULTAS"] !== undefined) locData[idx].fields["ACC FAKULTAS"] = newStatus;
+                if (locData[idx].fields["Status"] !== undefined) locData[idx].fields["Status"] = newStatus;
+            } else {
+                if (locData[idx].fields[fieldToUpdate] !== undefined) {
+                    locData[idx].fields[fieldToUpdate] = newStatus;
+                } else if (locData[idx].fields["Status"] !== undefined) {
+                    locData[idx].fields["Status"] = newStatus;
+                } else {
+                    locData[idx].fields[fieldToUpdate] = newStatus;
+                }
+            }
+        }
+        
         localStorage.setItem('sp_local_' + cat, JSON.stringify(locData));
         loadAllData();
     }
+}
+
+window.updateKeterangan = function(cat, id) {
+    const locData = JSON.parse(localStorage.getItem('sp_local_' + cat) || '[]');
+    const idx = locData.findIndex(x => x.fields._id === id);
+    if(idx !== -1) {
+        const currentKet = locData[idx].fields["Keterangan"] || "";
+        const newKet = prompt("Masukkan Keterangan:", currentKet);
+        if(newKet !== null) {
+            locData[idx].fields["Keterangan"] = newKet;
+            localStorage.setItem('sp_local_' + cat, JSON.stringify(locData));
+            loadAllData();
+        }
+    }
+}
+
+window.deleteLocalData = function(cat, id) {
+    if(!confirm('Yakin ingin menghapus data ini?')) return;
+    let locData = JSON.parse(localStorage.getItem('sp_local_' + cat) || '[]');
+    locData = locData.filter(x => x.fields._id !== id);
+    localStorage.setItem('sp_local_' + cat, JSON.stringify(locData));
+    loadAllData();
+}
+
+window.downloadCSV = function(cat, title) {
+    const locData = JSON.parse(localStorage.getItem('sp_local_' + cat) || '[]');
+    if(!locData.length) return alert('Tidak ada data untuk didownload');
+    
+    const keys = new Set();
+    locData.forEach(r => Object.keys(r.fields).filter(k=>!k.startsWith('_')).forEach(k=>keys.add(k)));
+    const headers = [...keys];
+    
+    let csv = headers.join(',') + '\n';
+    locData.forEach(r => {
+        csv += headers.map(k => {
+            let val = r.fields[k] || '';
+            if(typeof val === 'string') val = val.replace(/"/g, '""');
+            return `"${val}"`;
+        }).join(',') + '\n';
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Data_${title}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 document.addEventListener('keydown', e=>{ if(e.key==='Escape'){closeRecord();closeAccount();closeUploadModal();} });
@@ -991,6 +1159,79 @@ async function loadAllData() {
         document.getElementById('setupBanner').style.display='none';
     }
     
+    // Migration script for old keys
+    ['sp_local_surat', 'sp_local_pls', 'sp_local_pfak', 'sp_local_lfak', 'sp_local_cp', 'sp_local_cs', 'sp_local_cj', 'sp_local_cx'].forEach(k => {
+        let raw = localStorage.getItem(k);
+        if(raw) {
+            let parsed = JSON.parse(raw);
+            let changed = false;
+            parsed.forEach(r => {
+                if (k === 'sp_local_pfak') {
+                    if(r.fields["ACC BEM"]) { r.fields["ACC WD 1"] = r.fields["ACC BEM"]; delete r.fields["ACC BEM"]; changed = true; }
+                    if(r.fields["ACC BPM"]) { r.fields["ACC WD 2"] = r.fields["ACC BPM"]; delete r.fields["ACC BPM"]; changed = true; }
+                    if(r.fields["ACC KABEM"]) { r.fields["ACC WD 1"] = r.fields["ACC KABEM"]; delete r.fields["ACC KABEM"]; changed = true; }
+                    if(r.fields["ACC KABPM"]) { r.fields["ACC WD 2"] = r.fields["ACC KABPM"]; delete r.fields["ACC KABPM"]; changed = true; }
+                    if(r.fields["ACC FAKULTAS"]) { delete r.fields["ACC FAKULTAS"]; changed = true; }
+                } else {
+                    if(r.fields["ACC WD 1"]) { r.fields["ACC BEM"] = r.fields["ACC WD 1"]; delete r.fields["ACC WD 1"]; changed = true; }
+                    if(r.fields["ACC WD 2"]) { r.fields["ACC BPM"] = r.fields["ACC WD 2"]; delete r.fields["ACC WD 2"]; changed = true; }
+                    if(r.fields["ACC KABEM"]) { r.fields["ACC BEM"] = r.fields["ACC KABEM"]; delete r.fields["ACC KABEM"]; changed = true; }
+                    if(r.fields["ACC KABPM"]) { r.fields["ACC BPM"] = r.fields["ACC KABPM"]; delete r.fields["ACC KABPM"]; changed = true; }
+                }
+                
+                if(r.fields["EMAIL"]) { if(!r.fields["Email"]) r.fields["Email"] = r.fields["EMAIL"]; delete r.fields["EMAIL"]; changed = true; }
+                if(r.fields["EMAIL "]) { if(!r.fields["Email"]) r.fields["Email"] = r.fields["EMAIL "]; delete r.fields["EMAIL "]; changed = true; }
+                if(r.fields["Email "]) { if(!r.fields["Email"]) r.fields["Email"] = r.fields["Email "]; delete r.fields["Email "]; changed = true; }
+                
+                if(k === 'sp_local_surat') {
+                    Object.keys(r.fields).forEach(key => {
+                        if (key.toLowerCase().includes('keterangan')) {
+                            delete r.fields[key];
+                            changed = true;
+                        }
+                    });
+                }
+
+                if (r.fields["Pengirim"]) {
+                    delete r.fields["Pengirim"];
+                    changed = true;
+                }
+
+                // Reorder fields exactly to avoid display bugs
+                const reordered = {};
+                const keys = Object.keys(r.fields);
+                if (keys.includes("Tanggal")) reordered["Tanggal"] = r.fields["Tanggal"];
+                if (keys.includes("Email")) reordered["Email"] = r.fields["Email"];
+                if (keys.includes("ACC BEM")) reordered["ACC BEM"] = r.fields["ACC BEM"];
+                if (keys.includes("ACC BPM")) reordered["ACC BPM"] = r.fields["ACC BPM"];
+                if (keys.includes("ACC WD 1")) reordered["ACC WD 1"] = r.fields["ACC WD 1"];
+                if (keys.includes("ACC WD 2")) reordered["ACC WD 2"] = r.fields["ACC WD 2"];
+                if (keys.includes("ACC FAKULTAS") && k !== 'sp_local_pfak') reordered["ACC FAKULTAS"] = r.fields["ACC FAKULTAS"];
+                
+                // Keep other fields like Nama Kegiatan, etc.
+                // We want Keterangan to be after Nama Kegiatan
+                keys.forEach(key => {
+                    if (!(key in reordered) && key !== "Keterangan") {
+                        reordered[key] = r.fields[key];
+                        // If we just added "Nama Kegiatan", explicitly insert "Keterangan" for allowed categories
+                        if (key === "Nama Kegiatan" && k !== 'sp_local_surat') {
+                            reordered["Keterangan"] = r.fields["Keterangan"] || "";
+                        }
+                    }
+                });
+                
+                // If Keterangan wasn't added yet (e.g. Nama Kegiatan was missing), add it now for non-surat
+                if (!("Keterangan" in reordered) && k !== 'sp_local_surat') {
+                    reordered["Keterangan"] = r.fields["Keterangan"] || "";
+                }
+
+                r.fields = reordered;
+                changed = true;
+            });
+            if(changed) localStorage.setItem(k, JSON.stringify(parsed));
+        }
+    });
+
     // Selalu load, karena sekarang kita punya local storage fallback
     const res = await Promise.all(Object.keys(TBL).map(k=>loadOne(k)));
     const certTotal = res.slice(4).reduce((a,b)=>a+b,0);
@@ -1013,7 +1254,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const user = getUser();
-    if(user) { applyLogin(user); }
+    if(user) { 
+        applyLogin(user); 
+    } else {
+        ['navAvatar','mobAvatar'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML='<i class="fa-solid fa-lock"></i>'; });
+        ['navName','mobName'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent='Login Admin'; });
+        document.querySelectorAll('[data-role]').forEach(el => el.style.display = 'none');
+        loadAllData();
+    }
 });
 </script>
 </body>
