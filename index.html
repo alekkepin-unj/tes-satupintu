@@ -183,8 +183,8 @@ body.logged-in .sp-login{opacity:0;visibility:hidden;pointer-events:none}
         <button class="sp-mx" onclick="document.getElementById('loginOverlay').classList.add('hidden')" style="position:absolute; right:15px; top:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
         <img src="https://assets.softr-files.com/applications/2410f17e-de32-4977-adbc-a2c3e1642492/assets/10688f79-6bcc-459b-87d2-d00ae035b179.png" alt="SATU PINTU"
              onerror="this.outerHTML='<div style=font-size:2rem;font-weight:700;color:#0058d1;margin-bottom:1.5rem>SATU PINTU</div>'">
-        <h2>Login Admin</h2>
-        <p class="sp-login-sub">Masuk ke dashboard SATU PINTU</p>
+        <h2>Login Akun</h2>
+        <p class="sp-login-sub">Masuk sebagai Admin, BEM, BPM, atau Fakultas</p>
         <div class="sp-login-err" id="loginError"><i class="fa-solid fa-circle-exclamation"></i><span id="loginErrorText">Email atau password salah.</span></div>
         <form class="sp-login-form" onsubmit="handleLogin(event)">
             <label><i class="fa-solid fa-envelope mr-1" style="font-weight:400"></i> Email</label>
@@ -218,17 +218,17 @@ body.logged-in .sp-login{opacity:0;visibility:hidden;pointer-events:none}
             <div class="sp-af"><span class="sp-afl">Role</span><span class="sp-afv" id="accRole">-</span></div>
         </div>
         <div class="sp-as" data-role="Admin">
-            <h5><i class="fa-solid fa-database" style="color:var(--primary)"></i> Airtable</h5>
+            <h5><i class="fa-solid fa-database" style="color:var(--primary)"></i> Database Supabase</h5>
             <div class="sp-af"><span class="sp-afl">Status</span><span class="sp-afv" id="accAtStatus">-</span></div>
-            <div class="sp-af"><span class="sp-afl">Base ID</span><span class="sp-afv" style="font-family:monospace;font-size:.75rem">appDJznOSFiUC3CzU</span></div>
+            <div class="sp-af"><span class="sp-afl">Project URL</span><span class="sp-afv" style="font-family:monospace;font-size:.75rem" id="accSbUrl">https://khncavqieuvtvysxhhyb.supabase.co</span></div>
         </div>
         <div class="sp-as" data-role="Admin">
-            <h5><i class="fa-solid fa-key" style="color:var(--primary)"></i> Airtable Token</h5>
+            <h5><i class="fa-solid fa-key" style="color:var(--primary)"></i> Supabase Publishable Key</h5>
             <div style="display:flex;gap:.5rem">
-                <input type="password" id="accToken" placeholder="patXXXXXXX..." style="flex:1;padding:.5rem;border:1px solid var(--border);border-radius:var(--r);font-size:.8rem;font-family:monospace">
+                <input type="password" id="accToken" placeholder="sb_publishable_..." style="flex:1;padding:.5rem;border:1px solid var(--border);border-radius:var(--r);font-size:.8rem;font-family:monospace">
                 <button class="sp-btn" onclick="saveToken()">Simpan</button>
             </div>
-            <p style="font-size:.7rem;color:var(--muted);margin-top:.5rem">Disimpan di browser (localStorage).</p>
+            <p style="font-size:.7rem;color:var(--muted);margin-top:.5rem">Kunci API tersimpan di browser (localStorage) & config default.</p>
         </div>
         <div class="sp-as">
             <h5><i class="fa-solid fa-lock" style="color:var(--primary)"></i> Keamanan</h5>
@@ -273,7 +273,7 @@ body.logged-in .sp-login{opacity:0;visibility:hidden;pointer-events:none}
 
 <!-- ==================== SETUP BANNER ==================== -->
 <div class="sp-banner" id="setupBanner" style="display:none">
-    ⚠️ Airtable belum terhubung. <a href="javascript:void(0)" onclick="openAccount()">Buka Account Settings</a> untuk input token.
+    ⚠️ Database Supabase belum terhubung. <a href="javascript:void(0)" onclick="openAccount()">Buka Account Settings</a> untuk menghubungkan database.
 </div>
 
 <!-- ==================== NAVBAR ==================== -->
@@ -466,8 +466,8 @@ body.logged-in .sp-login{opacity:0;visibility:hidden;pointer-events:none}
 //  CONFIG — GANTI SESUAI KEBUTUHAN
 // ================================================================
 const CFG = {
-    pat: 'PASTE_TOKEN_KAMU_DI_SINI',   // Airtable PAT (atau input via Account Settings)
-    base: 'appDJznOSFiUC3CzU',          // Airtable Base ID
+    supabaseUrl: 'https://khncavqieuvtvysxhhyb.supabase.co',
+    supabaseKey: 'sb_publishable_KFfPHZC8ZJFnukljHoJyWA_cWWV-jig',
 
     // Daftar akun user (tambah/hapus sesuai kebutuhan)
     // Role: Admin = akses semua | BEM = Pengajuan Surat | BPM = PLS + Sertifikat | Fakultas = Pengajuan Fakultas
@@ -630,8 +630,8 @@ function applyLogin(user) {
     applyRoleAccess(user.role);
 
     // Load token ke account input
-    const t = getToken();
-    if(t && t !== CFG.pat) { const ti=document.getElementById('accToken'); if(ti) ti.value=t; }
+    const t = getSbKey();
+    if(t && t !== CFG.supabaseKey) { const ti=document.getElementById('accToken'); if(ti) ti.value=t; }
 
     // Load data
     loadAllData();
@@ -645,7 +645,7 @@ function handleLogout() {
     
     // Reset to public state
     ['navAvatar','mobAvatar'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML='<i class="fa-solid fa-lock"></i>'; });
-    ['navName','mobName'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent='Login Admin'; });
+    ['navName','mobName'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent='Masuk / Login'; });
     ['ddName','ddEmail','mobEmail'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=''; });
     const g = document.getElementById('wGreet');
     if(g) g.textContent = 'Halo, Mahasiswa!';
@@ -676,27 +676,60 @@ function togglePassword() {
 }
 
 // ================================================================
-//  AIRTABLE
+//  SUPABASE DATABASE
 // ================================================================
-function getToken() {
-    let t = localStorage.getItem('sp_airtable_pat') || '';
-    if(!t && CFG.pat && CFG.pat !== 'PASTE_TOKEN_KAMU_DI_SINI') t = CFG.pat;
-    return t;
+const CACHE_RECS = {};
+
+function getSbUrl() {
+    return localStorage.getItem('sp_supabase_url') || CFG.supabaseUrl || '';
 }
 
-function hasToken() { const t=getToken(); return t && t.length > 10 && t !== 'PASTE_TOKEN_KAMU_DI_SINI'; }
+function getSbKey() {
+    return localStorage.getItem('sp_supabase_key') || CFG.supabaseKey || '';
+}
+
+function getToken() {
+    return getSbKey();
+}
+
+function hasToken() {
+    const u = getSbUrl();
+    const k = getSbKey();
+    return !!(u && k && u.includes('supabase.co'));
+}
 
 function saveToken() {
     const v = document.getElementById('accToken').value.trim();
-    if(v) { localStorage.setItem('sp_airtable_pat', v); location.reload(); }
+    if(v) { localStorage.setItem('sp_supabase_key', v); location.reload(); }
 }
 
-async function fetchAt(tableName) {
-    const t = getToken();
-    if(!t) throw new Error('Token tidak tersedia');
-    const r = await fetch(`https://api.airtable.com/v0/${CFG.base}/${encodeURIComponent(tableName)}?maxRecords=100`, { headers: { Authorization: `Bearer ${t}` } });
-    if(!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error?.message || `HTTP ${r.status}`); }
-    return (await r.json()).records || [];
+function getSbHeaders() {
+    const k = getSbKey();
+    return {
+        'apikey': k,
+        'Authorization': `Bearer ${k}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+    };
+}
+
+async function fetchSb(kategori) {
+    if(!hasToken()) throw new Error('Database Supabase belum terhubung');
+    const r = await fetch(`${getSbUrl()}/rest/v1/pengajuan?kategori=eq.${encodeURIComponent(kategori)}&order=id.desc`, {
+        headers: getSbHeaders()
+    });
+    if(!r.ok) {
+        const e = await r.json().catch(()=>({}));
+        throw new Error(e.message || `HTTP ${r.status}`);
+    }
+    const list = await r.json();
+    return list.map(item => {
+        const f = { ...item.fields };
+        f._id = item.id;
+        f._cat = item.kategori;
+        f._created_at = item.created_at;
+        return { id: item.id, fields: f };
+    });
 }
 
 // ================================================================
@@ -757,10 +790,10 @@ function renderTable(recs, thId, tbId) {
         
         if (showAction) {
             let actionHtml = `<button class="sp-expand" onclick='showRec(${JSON.stringify(f).replace(/'/g,"&#39;")})'>Detail</button>`;
-            if (f._isLocal) {
+            if (f._id) {
                 actionHtml += `<button class="sp-expand bg-danger text-white mt-1 border-0" style="width:100%" onclick="deleteLocalData('${f._cat}', '${f._id}')"><i class="fa-solid fa-trash"></i> Hapus</button>`;
             }
-            if (f._isLocal && canApprove(u.role, f._cat)) {
+            if (f._id && canApprove(u.role, f._cat)) {
                 if (f._cat === 'pfak') {
                     actionHtml += `
                     <select class="sp-login-btn mt-1 w-100 p-1 bg-secondary text-white border-0" onchange="if(this.value){ const [field, stat] = this.value.split('|'); updateLocalStatus('${f._cat}', '${f._id}', stat, field); this.value=''; }">
@@ -777,7 +810,7 @@ function renderTable(recs, thId, tbId) {
                     </div>`;
                 }
             }
-            if (f._isLocal && (u.role === 'Fakultas' || u.role === 'Admin') && f._cat !== 'surat') {
+            if (f._id && (u.role === 'Fakultas' || u.role === 'Admin') && f._cat !== 'surat') {
                 actionHtml += `<button class="sp-expand bg-info text-white mt-1 border-0" style="width:100%" onclick="updateKeterangan('${f._cat}', '${f._id}')"><i class="fa-solid fa-pen"></i> Isi Keterangan</button>`;
             }
             rowHtml += `<td>${actionHtml}</td>`;
@@ -798,10 +831,10 @@ function renderGrid(recs, cId) {
         const t=f[keys[0]]||'Untitled', d=keys[1]?f[keys[1]]:'', dk=keys.find(x=>/tanggal|date/i.test(x));
         
         let actionHtml = '';
-        if (f._isLocal && u && u.role !== 'User') {
+        if (f._id && u && u.role !== 'User') {
             actionHtml += `<button class="sp-login-btn py-1 px-2 mt-2 w-100 bg-danger text-white border-0" onclick="deleteLocalData('${f._cat}', '${f._id}'); event.stopPropagation();"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>`;
         }
-        if(f._isLocal && u && canApprove(u.role, f._cat)) {
+        if(f._id && u && canApprove(u.role, f._cat)) {
             if (f._cat === 'pfak') {
                 actionHtml += `
                 <select class="sp-login-btn mt-2 w-100 p-2 bg-secondary text-white border-0" onchange="if(this.value){ const [field, stat] = this.value.split('|'); updateLocalStatus('${f._cat}', '${f._id}', stat, field); this.value=''; event.stopPropagation(); }" onclick="event.stopPropagation()">
@@ -817,6 +850,9 @@ function renderGrid(recs, cId) {
                     <button class="sp-login-btn py-1 px-2 flex-grow-1 bg-danger border-0" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak'); event.stopPropagation();"><i class="fa-solid fa-xmark mr-1"></i> Tolak</button>
                 </div>`;
             }
+        }
+        if (f._id && u && (u.role === 'Fakultas' || u.role === 'Admin') && f._cat !== 'surat') {
+            actionHtml += `<button class="sp-login-btn py-1 px-2 mt-2 w-100 bg-info text-white border-0" onclick="updateKeterangan('${f._cat}', '${f._id}'); event.stopPropagation();"><i class="fa-solid fa-pen mr-1"></i> Isi Keterangan</button>`;
         }
 
         return `<div class="col-12 col-md-6 col-lg-4">
@@ -855,8 +891,11 @@ function openAccount() {
         return;
     }
     document.getElementById('accountModal').style.display='flex'; 
-    const t=getToken(); 
-    if(t) document.getElementById('accAtStatus').innerHTML=`<span class="st st-a"><span class="st-dot"></span> Terhubung</span>`; else document.getElementById('accAtStatus').innerHTML=`<span class="st st-r"><span class="st-dot"></span> Belum terhubung</span>`; 
+    const t=hasToken(); 
+    if(t) document.getElementById('accAtStatus').innerHTML=`<span class="st st-a"><span class="st-dot"></span> Terhubung (Supabase)</span>`; 
+    else document.getElementById('accAtStatus').innerHTML=`<span class="st st-r"><span class="st-dot"></span> Belum terhubung</span>`; 
+    const sbUrlEl = document.getElementById('accSbUrl');
+    if (sbUrlEl) sbUrlEl.textContent = getSbUrl();
 }
 function closeAccount() { document.getElementById('accountModal').style.display='none'; }
 
@@ -999,8 +1038,6 @@ async function handleUpload(e) {
     const user = getUser();
     
     try {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
         let tblKey = cat;
         if(cat === 'admin') tblKey = 'pls';
         if(cat === 'prop_fak') tblKey = 'pfak';
@@ -1016,8 +1053,6 @@ async function handleUpload(e) {
         const fields = {
             "Tanggal": new Date().toLocaleDateString('id-ID'),
             "Email": user ? user.email : '',
-            "_isLocal": true,
-            "_id": 'loc_' + Date.now(),
             "_cat": tblKey
         };
         
@@ -1035,14 +1070,28 @@ async function handleUpload(e) {
         } else {
             fields["ACC BEM"] = "Pending";
             // Do NOT add Keterangan for surat
-            // Auto-generate Nomor Surat
+            // Auto-generate Nomor Surat based on database count
             const jnsSurat = document.querySelector('input[name="jns"]:checked')?.value;
             if (jnsSurat) {
                 const now2 = new Date();
                 const bulan2 = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][now2.getMonth()];
                 const tahun2 = now2.getFullYear();
                 const singkatan2 = { 'Dispensasi':'Disp','Keterangan':'Ket','Pemberitahuan':'Pmb','Peminjaman':'Pmj','Permohonan':'Pmh','Rekomendasi':'Rek','Undangan':'Und' };
-                let counter2 = parseInt(localStorage.getItem('sp_surat_counter') || '0') + 1;
+                
+                let counter2 = 1;
+                if (hasToken()) {
+                    try {
+                        const rCount = await fetch(`${getSbUrl()}/rest/v1/pengajuan?kategori=eq.surat&select=id`, { headers: getSbHeaders() });
+                        if (rCount.ok) {
+                            const listS = await rCount.json();
+                            counter2 = listS.length + 1;
+                        }
+                    } catch(e) {
+                        counter2 = parseInt(localStorage.getItem('sp_surat_counter') || '0') + 1;
+                    }
+                } else {
+                    counter2 = parseInt(localStorage.getItem('sp_surat_counter') || '0') + 1;
+                }
                 localStorage.setItem('sp_surat_counter', String(counter2));
                 fields["Nomor Surat"] = `${String(counter2).padStart(3,'0')}/B/${singkatan2[jnsSurat] || jnsSurat}/BEM FPsi/${bulan2}/${tahun2}`;
             }
@@ -1060,9 +1109,24 @@ async function handleUpload(e) {
             if(label && inp.files.length > 0) fields[label] = inp.files[0].name;
         });
 
-        const locData = JSON.parse(localStorage.getItem('sp_local_' + tblKey) || '[]');
-        locData.unshift({ fields: fields });
-        localStorage.setItem('sp_local_' + tblKey, JSON.stringify(locData));
+        if (hasToken()) {
+            const resp = await fetch(`${getSbUrl()}/rest/v1/pengajuan`, {
+                method: 'POST',
+                headers: getSbHeaders(),
+                body: JSON.stringify({ kategori: tblKey, fields: fields })
+            });
+            if (!resp.ok) {
+                const errJson = await resp.json().catch(()=>({}));
+                throw new Error(errJson.message || `Gagal menyimpan ke database (HTTP ${resp.status})`);
+            }
+        } else {
+            // Local storage fallback
+            fields["_isLocal"] = true;
+            fields["_id"] = 'loc_' + Date.now();
+            const locData = JSON.parse(localStorage.getItem('sp_local_' + tblKey) || '[]');
+            locData.unshift({ fields: fields });
+            localStorage.setItem('sp_local_' + tblKey, JSON.stringify(locData));
+        }
         
         document.getElementById('successModal').style.display = 'flex';
         closeUploadModal();
@@ -1075,11 +1139,53 @@ async function handleUpload(e) {
     }
 }
 
-window.updateLocalStatus = function(cat, id, newStatus, specificField) {
+window.updateLocalStatus = async function(cat, id, newStatus, specificField) {
     const u = getUser();
     if(!u) return;
     if(!confirm(`Yakin ubah status menjadi ${newStatus}?`)) return;
     
+    if (hasToken() && !String(id).startsWith('loc_')) {
+        try {
+            const getRes = await fetch(`${getSbUrl()}/rest/v1/pengajuan?id=eq.${id}&select=*`, { headers: getSbHeaders() });
+            const rows = await getRes.json();
+            if (!rows.length) throw new Error('Data tidak ditemukan');
+            const rec = rows[0];
+            const f = rec.fields;
+
+            if (specificField) {
+                f[specificField] = newStatus;
+            } else {
+                let fieldToUpdate = "Status";
+                if (u.role === 'BEM') fieldToUpdate = (cat === 'pfak') ? "ACC WD 1" : "ACC BEM";
+                else if (u.role === 'BPM') fieldToUpdate = (cat === 'pfak') ? "ACC WD 2" : "ACC BPM";
+                else if (u.role === 'Fakultas') fieldToUpdate = "ACC FAKULTAS";
+                
+                if (u.role === 'Admin') {
+                    if (f["ACC BEM"] !== undefined) f["ACC BEM"] = newStatus;
+                    if (f["ACC BPM"] !== undefined) f["ACC BPM"] = newStatus;
+                    if (f["ACC WD 1"] !== undefined) f["ACC WD 1"] = newStatus;
+                    if (f["ACC WD 2"] !== undefined) f["ACC WD 2"] = newStatus;
+                    if (f["ACC FAKULTAS"] !== undefined) f["ACC FAKULTAS"] = newStatus;
+                    if (f["Status"] !== undefined) f["Status"] = newStatus;
+                } else {
+                    f[fieldToUpdate] = newStatus;
+                }
+            }
+
+            const patchRes = await fetch(`${getSbUrl()}/rest/v1/pengajuan?id=eq.${id}`, {
+                method: 'PATCH',
+                headers: getSbHeaders(),
+                body: JSON.stringify({ fields: f })
+            });
+            if (!patchRes.ok) throw new Error('Gagal memperbarui status');
+            loadAllData();
+            return;
+        } catch(err) {
+            alert('Error: ' + err.message);
+            return;
+        }
+    }
+
     const locData = JSON.parse(localStorage.getItem('sp_local_' + cat) || '[]');
     const idx = locData.findIndex(x => x.fields._id === id);
     if(idx !== -1) {
@@ -1112,9 +1218,34 @@ window.updateLocalStatus = function(cat, id, newStatus, specificField) {
         localStorage.setItem('sp_local_' + cat, JSON.stringify(locData));
         loadAllData();
     }
-}
+};
 
-window.updateKeterangan = function(cat, id) {
+window.updateKeterangan = async function(cat, id) {
+    if (hasToken() && !String(id).startsWith('loc_')) {
+        try {
+            const getRes = await fetch(`${getSbUrl()}/rest/v1/pengajuan?id=eq.${id}&select=*`, { headers: getSbHeaders() });
+            const rows = await getRes.json();
+            if (!rows.length) throw new Error('Data tidak ditemukan');
+            const rec = rows[0];
+            const currentKet = rec.fields["Keterangan"] || "";
+            const newKet = prompt("Masukkan Keterangan:", currentKet);
+            if(newKet !== null) {
+                rec.fields["Keterangan"] = newKet;
+                const patchRes = await fetch(`${getSbUrl()}/rest/v1/pengajuan?id=eq.${id}`, {
+                    method: 'PATCH',
+                    headers: getSbHeaders(),
+                    body: JSON.stringify({ fields: rec.fields })
+                });
+                if (!patchRes.ok) throw new Error('Gagal memperbarui keterangan');
+                loadAllData();
+            }
+            return;
+        } catch(err) {
+            alert('Error: ' + err.message);
+            return;
+        }
+    }
+
     const locData = JSON.parse(localStorage.getItem('sp_local_' + cat) || '[]');
     const idx = locData.findIndex(x => x.fields._id === id);
     if(idx !== -1) {
@@ -1126,26 +1257,41 @@ window.updateKeterangan = function(cat, id) {
             loadAllData();
         }
     }
-}
+};
 
-window.deleteLocalData = function(cat, id) {
+window.deleteLocalData = async function(cat, id) {
     if(!confirm('Yakin ingin menghapus data ini?')) return;
+    if (hasToken() && !String(id).startsWith('loc_')) {
+        try {
+            const delRes = await fetch(`${getSbUrl()}/rest/v1/pengajuan?id=eq.${id}`, {
+                method: 'DELETE',
+                headers: getSbHeaders()
+            });
+            if (!delRes.ok) throw new Error('Gagal menghapus data dari database');
+            loadAllData();
+            return;
+        } catch(err) {
+            alert('Error: ' + err.message);
+            return;
+        }
+    }
+
     let locData = JSON.parse(localStorage.getItem('sp_local_' + cat) || '[]');
     locData = locData.filter(x => x.fields._id !== id);
     localStorage.setItem('sp_local_' + cat, JSON.stringify(locData));
     loadAllData();
-}
+};
 
 window.downloadCSV = function(cat, title) {
-    const locData = JSON.parse(localStorage.getItem('sp_local_' + cat) || '[]');
-    if(!locData.length) return alert('Tidak ada data untuk didownload');
+    const list = CACHE_RECS[cat] || JSON.parse(localStorage.getItem('sp_local_' + cat) || '[]');
+    if(!list.length) return alert('Tidak ada data untuk didownload');
     
     const keys = new Set();
-    locData.forEach(r => Object.keys(r.fields).filter(k=>!k.startsWith('_')).forEach(k=>keys.add(k)));
+    list.forEach(r => Object.keys(r.fields).filter(k=>!k.startsWith('_')).forEach(k=>keys.add(k)));
     const headers = [...keys];
     
     let csv = headers.join(',') + '\n';
-    locData.forEach(r => {
+    list.forEach(r => {
         csv += headers.map(k => {
             let val = r.fields[k] || '';
             if(typeof val === 'string') val = val.replace(/"/g, '""');
@@ -1160,7 +1306,7 @@ window.downloadCSV = function(cat, title) {
     a.download = `Data_${title}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-}
+};
 
 document.addEventListener('keydown', e=>{ if(e.key==='Escape'){closeRecord();closeAccount();closeUploadModal();} });
 
@@ -1175,21 +1321,32 @@ async function loadOne(key) {
     let recs = [];
     let errMessage = '';
     
-    // 1. Fetch Local Data
-    const locData = JSON.parse(localStorage.getItem('sp_local_' + key) || '[]');
-    recs = recs.concat(locData);
-    
-    // 2. Fetch Airtable Data (jika ada token)
+    // 1. Fetch Supabase Data
     if (hasToken()) {
         try {
-            const atData = await fetchAt(c.tbl);
-            recs = recs.concat(atData);
+            const sbData = await fetchSb(key);
+            recs = recs.concat(sbData);
         } catch(err) {
             errMessage = err.message;
         }
     } else {
-        errMessage = 'Airtable token belum di-set. Hanya menampilkan data lokal.';
+        errMessage = 'Database Supabase belum terhubung. Menampilkan data lokal jika ada.';
     }
+
+    // 2. Sertakan Local Storage data jika ada (agar data lama lokal tetap muncul)
+    const locData = JSON.parse(localStorage.getItem('sp_local_' + key) || '[]');
+    if (locData.length) {
+        recs = recs.concat(locData);
+    }
+
+    // Normalisasi _cat dan _id agar tombol aksi & hak akses role selalu aktif
+    recs.forEach((r, idx) => {
+        if (!r.fields) r.fields = {};
+        if (!r.fields._cat) r.fields._cat = key;
+        if (!r.fields._id) r.fields._id = r.id || ('loc_' + key + '_' + idx);
+    });
+
+    CACHE_RECS[key] = recs;
     
     // 3. Render
     if(ld) ld.style.display='none';
@@ -1319,7 +1476,7 @@ document.addEventListener('DOMContentLoaded', () => {
         applyLogin(user); 
     } else {
         ['navAvatar','mobAvatar'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML='<i class="fa-solid fa-lock"></i>'; });
-        ['navName','mobName'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent='Login Admin'; });
+        ['navName','mobName'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent='Masuk / Login'; });
         document.querySelectorAll('[data-role]').forEach(el => el.style.display = 'none');
         loadAllData();
     }
