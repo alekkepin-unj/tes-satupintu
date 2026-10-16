@@ -777,7 +777,14 @@ function renderTable(recs, thId, tbId) {
     const th=document.getElementById(thId), tb=document.getElementById(tbId);
     if(!th||!tb) return;
     if(!recs.length) { th.innerHTML=''; tb.innerHTML='<tr><td colspan="99" class="sp-em"><i class="fa-solid fa-inbox d-block"></i>Belum ada data</td></tr>'; return; }
-    const fs=new Set(); recs.forEach(r=>Object.keys(r.fields).filter(k=>!k.startsWith('_')).forEach(f=>fs.add(f))); const ff=[...fs];
+    const fs=new Set(); 
+    recs.forEach(r => {
+        Object.keys(r.fields).filter(k=>!k.startsWith('_')).forEach(f => {
+            if (f.toLowerCase() === 'email' && !r.fields[f]) return;
+            fs.add(f);
+        });
+    }); 
+    const ff=[...fs];
     
     const u = getUser();
     const showAction = u && ['Admin', 'BEM', 'BPM', 'Fakultas'].includes(u.role);
@@ -1052,7 +1059,6 @@ async function handleUpload(e) {
 
         const fields = {
             "Tanggal": new Date().toLocaleDateString('id-ID'),
-            "Email": user ? user.email : '',
             "_cat": tblKey
         };
         
@@ -1100,8 +1106,14 @@ async function handleUpload(e) {
         const inputs = document.getElementById('uploadForm').querySelectorAll('input:not([type="radio"]):not([type="hidden"]):not([type="file"]), input[type="radio"]:checked');
         inputs.forEach(inp => {
             let label = inp.closest('.sp-mf')?.querySelector('.sp-mfl')?.innerText.replace('*','').trim();
-            if(label) fields[label] = inp.value;
+            if(label) {
+                if (label.toLowerCase() === 'email') label = 'Email';
+                fields[label] = inp.value;
+            }
         });
+        if (!fields["Email"] && user && user.email) {
+            fields["Email"] = user.email;
+        }
         
         const files = document.getElementById('uploadForm').querySelectorAll('input[type="file"]');
         files.forEach(inp => {
@@ -1339,11 +1351,22 @@ async function loadOne(key) {
         recs = recs.concat(locData);
     }
 
-    // Normalisasi _cat dan _id agar tombol aksi & hak akses role selalu aktif
+    // Normalisasi _cat, _id, dan bersihkan duplikasi Email
     recs.forEach((r, idx) => {
         if (!r.fields) r.fields = {};
         if (!r.fields._cat) r.fields._cat = key;
         if (!r.fields._id) r.fields._id = r.id || ('loc_' + key + '_' + idx);
+
+        // Satukan variasi key Email dan buang kolom email kosong
+        const emailVal = r.fields["EMAIL"] || r.fields["Email"] || r.fields["Email "] || r.fields["EMAIL "];
+        delete r.fields["EMAIL"];
+        delete r.fields["Email "];
+        delete r.fields["EMAIL "];
+        if (emailVal) {
+            r.fields["Email"] = emailVal;
+        } else {
+            delete r.fields["Email"];
+        }
     });
 
     CACHE_RECS[key] = recs;
