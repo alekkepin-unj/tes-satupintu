@@ -260,6 +260,17 @@ body.logged-in .sp-login{opacity:0;visibility:hidden;pointer-events:none}
     </div>
 </div>
 
+<!-- ==================== SUCCESS MODAL ==================== -->
+<div class="sp-mo" id="successModal" style="display:none" onclick="if(event.target===this)document.getElementById('successModal').style.display='none'">
+    <div class="sp-mc" style="max-width:400px; width:95vw; text-align:center;">
+        <button class="sp-mx" onclick="document.getElementById('successModal').style.display='none'">&times;</button>
+        <i class="fa-solid fa-circle-check" style="font-size:4rem; color:#10b981; margin-bottom:1rem; margin-top:1rem;"></i>
+        <h4 style="margin-bottom:1rem; font-weight:600;">Pengajuan Berhasil!</h4>
+        <p style="color:var(--muted); font-size:0.9rem; margin-bottom:1.5rem;">Data akan langsung tampil di tabel bawah agar bisa dicek semua akun.</p>
+        <button class="sp-login-btn border-0" style="width:100%; background:var(--primary); color:white;" onclick="document.getElementById('successModal').style.display='none'">OK</button>
+    </div>
+</div>
+
 <!-- ==================== SETUP BANNER ==================== -->
 <div class="sp-banner" id="setupBanner" style="display:none">
     ⚠️ Airtable belum terhubung. <a href="javascript:void(0)" onclick="openAccount()">Buka Account Settings</a> untuk input token.
@@ -734,36 +745,46 @@ function renderTable(recs, thId, tbId) {
     if(!th||!tb) return;
     if(!recs.length) { th.innerHTML=''; tb.innerHTML='<tr><td colspan="99" class="sp-em"><i class="fa-solid fa-inbox d-block"></i>Belum ada data</td></tr>'; return; }
     const fs=new Set(); recs.forEach(r=>Object.keys(r.fields).filter(k=>!k.startsWith('_')).forEach(f=>fs.add(f))); const ff=[...fs];
-    th.innerHTML=`<tr><th>#</th>${ff.map(f=>`<th>${esc(f)}</th>`).join('')}<th>Aksi</th></tr>`;
     
     const u = getUser();
+    const showAction = u && ['Admin', 'BEM', 'BPM', 'Fakultas'].includes(u.role);
+    
+    th.innerHTML=`<tr><th>#</th>${ff.map(f=>`<th>${esc(f)}</th>`).join('')}${showAction ? '<th>Aksi</th>' : ''}</tr>`;
+    
     tb.innerHTML=recs.map((r,i)=> {
         const f = r.fields;
-        let actionHtml = `<button class="sp-expand" onclick='showRec(${JSON.stringify(f).replace(/'/g,"&#39;")})'>Detail</button>`;
-        if (f._isLocal && u && u.role !== 'User') {
-            actionHtml += `<button class="sp-expand bg-danger text-white mt-1 border-0" style="width:100%" onclick="deleteLocalData('${f._cat}', '${f._id}')"><i class="fa-solid fa-trash"></i> Hapus</button>`;
-        }
-        if (f._isLocal && u && canApprove(u.role, f._cat)) {
-            if (f._cat === 'pfak') {
-                actionHtml += `
-                <select class="sp-login-btn mt-1 w-100 p-1 bg-secondary text-white border-0" onchange="if(this.value){ const [field, stat] = this.value.split('|'); updateLocalStatus('${f._cat}', '${f._id}', stat, field); this.value=''; }">
-                    <option value="">Aksi</option>
-                    <option value="ACC WD 1|Disetujui">✅ Terima WD 1</option>
-                    <option value="ACC WD 1|Ditolak">❌ Tolak WD 1</option>
-                    <option value="ACC WD 2|Disetujui">✅ Terima WD 2</option>
-                    <option value="ACC WD 2|Ditolak">❌ Tolak WD 2</option>
-                </select>`;
-            } else {
-                actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
-                    <button class="sp-login-btn p-1 flex-grow-1 bg-success border-0" title="Terima" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui')"><i class="fa-solid fa-check"></i></button>
-                    <button class="sp-login-btn p-1 flex-grow-1 bg-danger border-0" title="Tolak" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak')"><i class="fa-solid fa-xmark"></i></button>
-                </div>`;
+        let rowHtml = `<tr><td>${i+1}</td>${ff.map(k=>`<td>${renderCell(f[k],k)}</td>`).join('')}`;
+        
+        if (showAction) {
+            let actionHtml = `<button class="sp-expand" onclick='showRec(${JSON.stringify(f).replace(/'/g,"&#39;")})'>Detail</button>`;
+            if (f._isLocal) {
+                actionHtml += `<button class="sp-expand bg-danger text-white mt-1 border-0" style="width:100%" onclick="deleteLocalData('${f._cat}', '${f._id}')"><i class="fa-solid fa-trash"></i> Hapus</button>`;
             }
+            if (f._isLocal && canApprove(u.role, f._cat)) {
+                if (f._cat === 'pfak') {
+                    actionHtml += `
+                    <select class="sp-login-btn mt-1 w-100 p-1 bg-secondary text-white border-0" onchange="if(this.value){ const [field, stat] = this.value.split('|'); updateLocalStatus('${f._cat}', '${f._id}', stat, field); this.value=''; }">
+                        <option value="">-- Aksi WD --</option>
+                        <option value="ACC WD 1|Disetujui">✅ Terima WD 1</option>
+                        <option value="ACC WD 1|Ditolak">❌ Tolak WD 1</option>
+                        <option value="ACC WD 2|Disetujui">✅ Terima WD 2</option>
+                        <option value="ACC WD 2|Ditolak">❌ Tolak WD 2</option>
+                    </select>`;
+                } else {
+                    actionHtml += `<div class="mt-1 d-flex flex-nowrap" style="gap:5px;">
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-success border-0" title="Terima" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Disetujui')"><i class="fa-solid fa-check"></i></button>
+                        <button class="sp-login-btn p-1 flex-grow-1 bg-danger border-0" title="Tolak" onclick="updateLocalStatus('${f._cat}', '${f._id}', 'Ditolak')"><i class="fa-solid fa-xmark"></i></button>
+                    </div>`;
+                }
+            }
+            if (f._isLocal && (u.role === 'Fakultas' || u.role === 'Admin') && f._cat !== 'surat') {
+                actionHtml += `<button class="sp-expand bg-info text-white mt-1 border-0" style="width:100%" onclick="updateKeterangan('${f._cat}', '${f._id}')"><i class="fa-solid fa-pen"></i> Isi Keterangan</button>`;
+            }
+            rowHtml += `<td>${actionHtml}</td>`;
         }
-        if (f._isLocal && u && (u.role === 'Fakultas' || u.role === 'Admin') && f._cat !== 'surat') {
-            actionHtml += `<button class="sp-expand bg-info text-white mt-1 border-0" style="width:100%" onclick="updateKeterangan('${f._cat}', '${f._id}')"><i class="fa-solid fa-pen"></i> Isi Keterangan</button>`;
-        }
-        return `<tr><td>${i+1}</td>${ff.map(k=>`<td>${renderCell(f[k],k)}</td>`).join('')}<td>${actionHtml}</td></tr>`;
+        
+        rowHtml += `</tr>`;
+        return rowHtml;
     }).join('');
 }
 
@@ -784,7 +805,7 @@ function renderGrid(recs, cId) {
             if (f._cat === 'pfak') {
                 actionHtml += `
                 <select class="sp-login-btn mt-2 w-100 p-2 bg-secondary text-white border-0" onchange="if(this.value){ const [field, stat] = this.value.split('|'); updateLocalStatus('${f._cat}', '${f._id}', stat, field); this.value=''; event.stopPropagation(); }" onclick="event.stopPropagation()">
-                    <option value="">Aksi</option>
+                    <option value="">-- Aksi WD --</option>
                     <option value="ACC WD 1|Disetujui">✅ Terima WD 1</option>
                     <option value="ACC WD 1|Ditolak">❌ Tolak WD 1</option>
                     <option value="ACC WD 2|Disetujui">✅ Terima WD 2</option>
@@ -838,6 +859,38 @@ function openAccount() {
     if(t) document.getElementById('accAtStatus').innerHTML=`<span class="st st-a"><span class="st-dot"></span> Terhubung</span>`; else document.getElementById('accAtStatus').innerHTML=`<span class="st st-r"><span class="st-dot"></span> Belum terhubung</span>`; 
 }
 function closeAccount() { document.getElementById('accountModal').style.display='none'; }
+
+function generateNomorSurat(forceNew = false) {
+    const jns = document.querySelector('input[name="jns"]:checked')?.value;
+    const el = document.getElementById('upNomorSurat');
+    if (!el) return;
+    if (!jns) { el.value = ''; el.placeholder = 'Pilih jenis pengajuan dulu...'; return; }
+
+    const now = new Date();
+    const bulan = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][now.getMonth()];
+    const tahun = now.getFullYear();
+    const singkatan = {
+        'Dispensasi': 'Disp', 'Keterangan': 'Ket', 'Pemberitahuan': 'Pmb',
+        'Peminjaman': 'Pmj', 'Permohonan': 'Pmh', 'Rekomendasi': 'Rek', 'Undangan': 'Und'
+    };
+
+    // Use dedicated counter in localStorage to prevent duplicates
+    let counter = parseInt(localStorage.getItem('sp_surat_counter') || '0');
+
+    // If field already has a value (same session, just switching jenis), update only the singkatan part
+    if (el.value && !forceNew) {
+        const currentNo = el.value.split('/')[0];
+        el.value = `${currentNo}/B/${singkatan[jns] || jns}/BEM FPsi/${bulan}/${tahun}`;
+        return;
+    }
+
+    // Generate new number: increment counter for new form session
+    counter += 1;
+    localStorage.setItem('sp_surat_counter', String(counter));
+
+    const newNo = String(counter).padStart(3, '0');
+    el.value = `${newNo}/B/${singkatan[jns] || jns}/BEM FPsi/${bulan}/${tahun}`;
+}
 
 const FORMS = {
     surat: {
@@ -982,6 +1035,17 @@ async function handleUpload(e) {
         } else {
             fields["ACC BEM"] = "Pending";
             // Do NOT add Keterangan for surat
+            // Auto-generate Nomor Surat
+            const jnsSurat = document.querySelector('input[name="jns"]:checked')?.value;
+            if (jnsSurat) {
+                const now2 = new Date();
+                const bulan2 = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][now2.getMonth()];
+                const tahun2 = now2.getFullYear();
+                const singkatan2 = { 'Dispensasi':'Disp','Keterangan':'Ket','Pemberitahuan':'Pmb','Peminjaman':'Pmj','Permohonan':'Pmh','Rekomendasi':'Rek','Undangan':'Und' };
+                let counter2 = parseInt(localStorage.getItem('sp_surat_counter') || '0') + 1;
+                localStorage.setItem('sp_surat_counter', String(counter2));
+                fields["Nomor Surat"] = `${String(counter2).padStart(3,'0')}/B/${singkatan2[jnsSurat] || jnsSurat}/BEM FPsi/${bulan2}/${tahun2}`;
+            }
         }
         
         const inputs = document.getElementById('uploadForm').querySelectorAll('input:not([type="radio"]):not([type="hidden"]):not([type="file"]), input[type="radio"]:checked');
@@ -1000,7 +1064,7 @@ async function handleUpload(e) {
         locData.unshift({ fields: fields });
         localStorage.setItem('sp_local_' + tblKey, JSON.stringify(locData));
         
-        alert(`Pengajuan berhasil dikirim!\n\nData akan langsung tampil di tabel bawah agar bisa dicek semua akun.`);
+        document.getElementById('successModal').style.display = 'flex';
         closeUploadModal();
         loadAllData();
     } catch (err) {
